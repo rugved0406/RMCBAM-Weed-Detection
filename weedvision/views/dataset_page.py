@@ -209,9 +209,31 @@ def render():
             ui.card(c[2], "Match score", f"{df['score'].min():.3f}", "minimum NCC (1.0 = exact)")
             ui.card(c[3], "Source images", str(df["source"].nunique()), "with ≥1 recovered box")
             st.write("")
-            st.warning(
-                "These are **partial** annotations: one weed region and one crop region per image, and the crop species is not recorded "
-                "in the files (labelled `Crop`). Open `data/recovered/labelme/*.json` in LabelMe, rename `Crop` to the species, and annotate "
-                "the remaining plants before training."
-            )
-            st.dataframe(df.drop(columns=[c for c in ("patch_path", "source_path") if c in df]), hide_index=True, use_container_width=True, height=320)
+            st.dataframe(df.drop(columns=[c for c in ("patch_path", "source_path") if c in df]), hide_index=True, use_container_width=True, height=260)
+
+            st.markdown("#### Visual Annotation Reviewer")
+            src_imgs = sorted(df["source"].dropna().unique())
+            if src_imgs:
+                pick_src = st.selectbox("Select image to review bounding boxes:", src_imgs)
+                sub_df = df[df["source"] == pick_src]
+                img_path = Path(sub_df.iloc[0]["source_path"])
+                if img_path.exists():
+                    from weedvision.inference import Detection, draw_detections, load_image_rgb
+                    raw_rgb = load_image_rgb(str(img_path))
+                    h_im, w_im = raw_rgb.shape[:2]
+                    review_dets = []
+                    for idx, r_box in sub_df.iterrows():
+                        review_dets.append(
+                            Detection(
+                                cls_id=0 if r_box["label"] == "Weed" else 1,
+                                cls_name=str(r_box["label"]),
+                                conf=float(r_box["score"]),
+                                x1=float(r_box["x1"]),
+                                y1=float(r_box["y1"]),
+                                x2=float(r_box["x2"]),
+                                y2=float(r_box["y2"]),
+                                uid=f"{r_box['label']}-{idx+1}",
+                            )
+                        )
+                    ann_img = draw_detections(raw_rgb, review_dets, show_conf=True)
+                    st.image(ann_img, caption=f"{pick_src} — {len(review_dets)} recovered boxes (Scores: {', '.join(f'{d.cls_name}:{d.conf:.3f}' for d in review_dets)})", use_container_width=True)

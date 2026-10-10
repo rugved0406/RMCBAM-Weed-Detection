@@ -1,0 +1,7 @@
+method,detection,conf,box_area_frac,energy_in_box,ratio_vs_uniform
+gradcam,P-001,0.887,0.1112,0.1937,1.74
+gradcam,P-002,0.878,0.0638,0.0909,1.42
+gradcam,P-003,0.893,0.0796,0.1125,1.41
+hirescam,P-001,0.887,0.1112,0.8872,7.98
+hirescam,P-002,0.878,0.0638,0.8532,13.37
+hirescam,P-003,0.893,0.0796,0.825,10.37

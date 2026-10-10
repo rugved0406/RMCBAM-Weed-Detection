@@ -1,0 +1,16 @@
+{
+  "originals": 566,
+  "originals_likely_augmented": 250,
+  "originals_in_near_duplicate_groups": 117,
+  "near_duplicate_groups": 52,
+  "distinct_resolutions": 226,
+  "top_resolutions": {
+    "1832x1374": 184,
+    "1587x1190": 47,
+    "1586x1189": 39,
+    "1464x1098": 22,
+    "1708x1281": 21
+  },
+  "median_sharpness_lapvar": 1556.1090414427972,
+  "median_green_frac": 0.31695724633385347
+}

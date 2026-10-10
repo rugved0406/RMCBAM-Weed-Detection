@@ -1,0 +1,13 @@
+# Tested with: Python 3.13, torch 2.14.1, ultralytics 8.4.174, streamlit 1.65.0, plotly 7.1.0 (CPU)
+# For an NVIDIA GPU, install torch/torchvision first from https://pytorch.org/get-started/locally/
+torch>=2.2
+torchvision>=0.17
+ultralytics>=8.3.0,<8.5
+streamlit>=1.40
+plotly>=5.20
+opencv-python-headless>=4.9
+numpy>=1.26
+pandas>=2.1
+Pillow>=10.0
+PyYAML>=6.0
+pytest>=8.0

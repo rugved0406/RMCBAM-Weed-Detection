@@ -1,0 +1,7 @@
+layer,channels,eca_kernel,params
+model.4.att,128,5,309
+model.6.att,256,5,437
+model.8.att,512,5,693
+model.15.att,128,5,309
+model.18.att,256,5,437
+model.21.att,512,5,693

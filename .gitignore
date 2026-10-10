@@ -1,0 +1,58 @@
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest / Test / Coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Large dataset archives (>100MB exceeds GitHub limit)
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+
+# Raw / Local image datasets (generated or extracted locally)
+data/Himani mam images/
+data/yolo/
+*.cache
+
+# Training runs & temporary checkpoints
+runs/
+yolov8s.pt
+models/uploaded/
+
+# Streamlit secrets & local state
+.streamlit/secrets.toml
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

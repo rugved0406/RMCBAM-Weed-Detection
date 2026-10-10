@@ -1,0 +1,3 @@
+model,params,GFLOPs@640,rmcbam_blocks,rmcbam_layers
+YOLOv8s baseline,11137535,28.651,0,
+YOLOv8s + RMCBAM,11140413,28.671,6,"[4, 6, 8, 15, 18, 21]"

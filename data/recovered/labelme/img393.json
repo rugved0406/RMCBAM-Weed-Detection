@@ -1,0 +1,27 @@
+{
+  "version": "5.4.1",
+  "flags": {},
+  "shapes": [
+    {
+      "label": "Weed",
+      "points": [
+        [
+          0.0,
+          994.0
+        ],
+        [
+          140.0,
+          1178.0
+        ]
+      ],
+      "group_id": null,
+      "description": "recovered from patch weed_052_img393.jpg (NCC=0.9965)",
+      "shape_type": "rectangle",
+      "flags": {}
+    }
+  ],
+  "imagePath": "../../Himani mam images/Origanal/img393.jpg",
+  "imageData": null,
+  "imageHeight": 1302,
+  "imageWidth": 1737
+}

@@ -1,0 +1,27 @@
+{
+  "version": "5.4.1",
+  "flags": {},
+  "shapes": [
+    {
+      "label": "Crop",
+      "points": [
+        [
+          828.0,
+          0.0
+        ],
+        [
+          1231.0,
+          325.0
+        ]
+      ],
+      "group_id": null,
+      "description": "recovered from patch crop_064_img194.jpg (NCC=0.9981)",
+      "shape_type": "rectangle",
+      "flags": {}
+    }
+  ],
+  "imagePath": "../../Himani mam images/Origanal/img194.jpg",
+  "imageData": null,
+  "imageHeight": 1293,
+  "imageWidth": 1724
+}

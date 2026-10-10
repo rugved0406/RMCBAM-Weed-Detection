@@ -1,0 +1,44 @@
+{
+  "version": "5.4.1",
+  "flags": {},
+  "shapes": [
+    {
+      "label": "Weed",
+      "points": [
+        [
+          1436.0,
+          1026.0
+        ],
+        [
+          2074.0,
+          1556.0
+        ]
+      ],
+      "group_id": null,
+      "description": "recovered from patch weed_043_img357.jpg (NCC=0.9968)",
+      "shape_type": "rectangle",
+      "flags": {}
+    },
+    {
+      "label": "Crop",
+      "points": [
+        [
+          603.0,
+          525.0
+        ],
+        [
+          847.0,
+          831.0
+        ]
+      ],
+      "group_id": null,
+      "description": "recovered from patch crop_042_img357.jpg (NCC=0.9944)",
+      "shape_type": "rectangle",
+      "flags": {}
+    }
+  ],
+  "imagePath": "../../Himani mam images/Origanal/img357.jpg",
+  "imageData": null,
+  "imageHeight": 1556,
+  "imageWidth": 2074
+}

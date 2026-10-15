@@ -15,17 +15,16 @@ WEED_CLASS = "Weed"
 CROP_CLASSES: list[str] = ["Tomato", "Rose", "Marigold", "Cauliflower"]
 
 # Colours (BGR for OpenCV, hex for Plotly) per class name; unknown classes fall back to grey.
-# Validated categorical order (dataviz reference palette, dark steps) assigned in class-index order:
-# passes CVD separation (>=8 ΔE) and normal-vision floor on the dark surface.
 CLASS_COLORS_HEX: dict[str, str] = {
-    "Weed": "#3987e5",
-    "Tomato": "#d95926",
-    "Rose": "#199e70",
-    "Marigold": "#c98500",
-    "Cauliflower": "#d55181",
-    "Crop": "#9085e9",  # unspecified crop (e.g. recovered patches)
+    "Weed": "#dc2626",        # Crisp ruby red for weed targets (replaces neon blue)
+    "Tomato": "#ea580c",      # Muted terracotta
+    "Rose": "#059669",        # Deep botanical green
+    "Marigold": "#d97706",    # Warm amber
+    "Cauliflower": "#7c3aed", # Muted plum
+    "Crop": "#0d9488",        # Subtle teal
 }
-DEFAULT_COLOR_HEX = "#898781"
+DEFAULT_COLOR_HEX = "#64748b"
+
 
 # Status palette (reserved for severity; always shown with an icon + label).
 SEVERITY_COLORS: dict[str, str] = {"Low": "#0ca30c", "Moderate": "#fab219", "High": "#ec835a", "Severe": "#d03b3b"}

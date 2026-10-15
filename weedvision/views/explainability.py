@@ -122,6 +122,7 @@ def _attention_section(model_path, img, imgsz, info):
     sel = st.selectbox("Channel attention of layer", [m["layer"] for m in maps])
     m = next(x for x in maps if x["layer"] == sel)
     order = np.argsort(-m["channel"])
-    fig = go.Figure(go.Bar(x=np.arange(len(order)), y=m["channel"][order], marker_color="#3987e5", hovertemplate="channel %{customdata}<br>weight %{y:.3f}<extra></extra>", customdata=order))
+    fig = go.Figure(go.Bar(x=np.arange(len(order)), y=m["channel"][order], marker_color="#216B45", hovertemplate="channel %{customdata}<br>weight %{y:.3f}<extra></extra>", customdata=order))
     fig.update_layout(title=f"Layer {sel}: ECA channel weights (sorted)", xaxis_title="channel rank", yaxis_title="attention weight", height=300, bargap=0.05)
     st.plotly_chart(fig, use_container_width=True)
+

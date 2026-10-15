@@ -10,7 +10,7 @@ import streamlit as st
 from weedvision import ui
 from weedvision.comparison import METRIC_COLS, best_epoch_metrics, find_runs, load_results, run_plots, validate
 
-VARIANT_COLORS = {"Baseline": "#898781", "RMCBAM": "#3987e5"}
+VARIANT_COLORS = {"Baseline": "#76867D", "RMCBAM": "#216B45"}
 
 
 def render():
@@ -117,7 +117,7 @@ def render():
 
 def _guess(items, rmcbam: bool) -> int:
     for i, p in enumerate(items):
-        tail = "/".join(Path(p).parts[-3:]).lower()  # run/weights/file — never the project folder name
+        tail = "/".join(Path(p).parts[-3:]).lower()
         if ("rmcbam" in tail) == rmcbam:
             return i
     return 0
@@ -140,7 +140,7 @@ def _bar(tab: pd.DataFrame, title: str = "Best-epoch metrics"):
     mets = [m for m in ["precision", "recall", "F1", "mAP50", "mAP50-95"] if m in tab]
     fig = go.Figure()
     for _, row in tab.iterrows():
-        fig.add_trace(go.Bar(name=row["model"], x=mets, y=[row[m] for m in mets], marker_color=VARIANT_COLORS.get(row["model"]), text=[f"{row[m]:.3f}" if pd.notna(row[m]) else "" for m in mets], textposition="outside", textfont_color="#c3c2b7", marker_line=dict(color="#1a1a19", width=2)))
+        fig.add_trace(go.Bar(name=row["model"], x=mets, y=[row[m] for m in mets], marker_color=VARIANT_COLORS.get(row["model"]), text=[f"{row[m]:.3f}" if pd.notna(row[m]) else "" for m in mets], textposition="outside", textfont_color="#17231D", marker_line=dict(color="#DCE4DD", width=1)))
     fig.update_layout(barmode="group", height=340, yaxis_range=[0, 1.08], yaxis_title="score", title=title, legend=dict(orientation="h", y=1.1))
     st.plotly_chart(fig, use_container_width=True)
 
@@ -182,7 +182,7 @@ def _show_validation(out: dict):
             norm = np.divide(cm, colsum, out=np.zeros_like(cm, dtype=float), where=colsum > 0)
             fig = go.Figure(go.Heatmap(z=norm[:n, :n], x=names[:n], y=names[:n], colorscale=ui.SEQ_SCALE, zmin=0, zmax=1, text=cm[:n, :n].astype(int), texttemplate="%{text}", hovertemplate="true %{x}<br>pred %{y}<br>%{z:.2f} of column (n=%{text})<extra></extra>"))
             fig.update_layout(title=f"{k}: confusion matrix (column-normalised, counts shown)", xaxis_title="True", yaxis_title="Predicted", height=420)
-            fig.update_yaxes(autorange="reversed")  # same class order top-to-bottom as left-to-right
+            fig.update_yaxes(autorange="reversed")
             col.plotly_chart(fig, use_container_width=True)
     for k, v in out.items():
         st.caption(f"{k}: plots saved to `{v['save_dir']}`")

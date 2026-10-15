@@ -69,6 +69,50 @@ def test_draw_and_df():
     assert df.loc[0, "uid"] == "W-001" and math.isclose(df.loc[0, "area_pct"], 8.0)
 
 
+def test_draw_detections_anti_collision():
+    img = np.zeros((400, 400, 3), np.uint8)
+    # 4 highly clustered weed detections at almost the same location
+    clustered = assign_ids([
+        D("Weed", 100, 100, 140, 140, conf=0.95),
+        D("Weed", 102, 102, 142, 142, conf=0.88),
+        D("Weed", 105, 105, 145, 145, conf=0.75),
+        D("Weed", 108, 108, 148, 148, conf=0.60),
+    ])
+    out = draw_detections(img, clustered, show_conf=True, show_labels=True, show_boxes=True)
+    assert out.shape == img.shape and out.sum() > 0
+
+
+def test_draw_detections_filtering_and_toggles():
+    img = np.zeros((300, 300, 3), np.uint8)
+    ds = assign_ids([
+        D("Weed", 10, 10, 50, 50, conf=0.90),
+        D("Weed", 60, 60, 100, 100, conf=0.40),
+        D("Rose", 120, 120, 160, 160, conf=0.20),
+    ])
+    
+    # Confidence filter: only conf >= 0.50 should render
+    filtered_out = draw_detections(img, ds, conf_threshold=0.50)
+    assert filtered_out.shape == img.shape and filtered_out.sum() > 0
+
+    # Max detections limit: top 1
+    top1_out = draw_detections(img, ds, max_detections=1)
+    assert top1_out.shape == img.shape and top1_out.sum() > 0
+
+    # Toggles: boxes only, labels only, no annotations
+    boxes_only = draw_detections(img, ds, show_boxes=True, show_labels=False)
+    labels_only = draw_detections(img, ds, show_boxes=False, show_labels=True)
+    none_rendered = draw_detections(img, ds, show_boxes=False, show_labels=False)
+    
+    assert boxes_only.sum() > 0
+    assert labels_only.sum() > 0
+    assert none_rendered.sum() == 0  # Black background untouched
+
+    # Empty list handling
+    empty_out = draw_detections(img, [])
+    assert empty_out.shape == img.shape and empty_out.sum() == 0
+
+
+
 # ------------------------------------------------------------------ pipeline tests on a real detector
 WEIGHTS = Path(__file__).resolve().parent.parent / "yolov8s.pt"
 

@@ -9,8 +9,8 @@ from weedvision.rmcbam import DEFAULT_RMCBAM_LAYERS, eca_kernel_size
 RMCBAM_DOT = """
 digraph G {
   rankdir=LR; bgcolor="transparent";
-  node [shape=box, style="rounded,filled", fillcolor="#1a1a19", color="#383835", fontcolor="#f2f1ec", fontname="Helvetica", fontsize=14];
-  edge [color="#898781", fontcolor="#c3c2b7", fontname="Helvetica", fontsize=12];
+  node [shape=box, style="rounded,filled", fillcolor="#FFFFFF", color="#DCE4DD", fontcolor="#17231D", fontname="Helvetica", fontsize=13];
+  edge [color="#216B45", fontcolor="#59665E", fontname="Helvetica", fontsize=11];
   x [label="C2f output x\\nC×H×W"];
   gap [label="GAP + GMP"]; eca [label="shared Conv1d(k)\\nECA, no FC"]; mc [label="σ → Mc\\nC×1×1"];
   mul1 [label="x ⊙ Mc", shape=ellipse];

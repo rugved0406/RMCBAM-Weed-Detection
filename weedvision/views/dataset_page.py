@@ -85,7 +85,7 @@ def render():
             counts = df["class"].value_counts() if len(df) else pd.Series(dtype=int)
             order = CLASS_NAMES + [k for k in counts.index if k not in CLASS_NAMES]
             vals = [int(counts.get(k, 0)) for k in order]
-            fig = go.Figure(go.Bar(x=order, y=vals, marker_color=[class_color_hex(k) for k in order], text=vals, textposition="outside", textfont_color="#c3c2b7", marker_line=dict(color="#1a1a19", width=2)))
+            fig = go.Figure(go.Bar(x=order, y=vals, marker_color=[class_color_hex(k) for k in order], text=vals, textposition="outside", textfont_color="#17231D", marker_line=dict(color="#DCE4DD", width=1)))
             fig.update_layout(title="Annotated instances per class", yaxis_title="instances", height=340, bargap=0.35)
             st.plotly_chart(fig, use_container_width=True)
             absent = [k for k in CLASS_NAMES if counts.get(k, 0) == 0]
@@ -101,7 +101,7 @@ def render():
                 fig = go.Figure()
                 for k in [x for x in order if x in set(df["class"])]:
                     d = df[df["class"] == k]
-                    fig.add_trace(go.Scatter(x=d["w_frac"], y=d["h_frac"], mode="markers", name=k, marker=dict(size=8, color=class_color_hex(k), line=dict(color="#1a1a19", width=1.5)), hovertemplate=f"{k}<br>w %{{x:.3f}} · h %{{y:.3f}} of image<extra></extra>"))
+                    fig.add_trace(go.Scatter(x=d["w_frac"], y=d["h_frac"], mode="markers", name=k, marker=dict(size=8, color=class_color_hex(k), line=dict(color="#FFFFFF", width=1.5)), hovertemplate=f"{k}<br>w %{{x:.3f}} · h %{{y:.3f}} of image<extra></extra>"))
                 fig.update_layout(title="Box size (fraction of image)", xaxis_title="width / image width", yaxis_title="height / image height", height=380)
                 st.plotly_chart(fig, use_container_width=True)
             if missing:
@@ -128,7 +128,7 @@ def render():
                     st.dataframe(pd.DataFrame({"issue": v["issues"][:500]}), hide_index=True, use_container_width=True)
                 if v["instances"]:
                     names = v["names"]
-                    fig = go.Figure(go.Bar(x=names, y=[v["instances"].get(n, 0) for n in names], marker_color=[class_color_hex(n) for n in names], text=[v["instances"].get(n, 0) for n in names], textposition="outside", textfont_color="#c3c2b7"))
+                    fig = go.Figure(go.Bar(x=names, y=[v["instances"].get(n, 0) for n in names], marker_color=[class_color_hex(n) for n in names], text=[v["instances"].get(n, 0) for n in names], textposition="outside", textfont_color="#17231D", marker_line=dict(color="#DCE4DD", width=1)))
                     fig.update_layout(title="Instances per class (all splits)", height=320, bargap=0.35)
                     st.plotly_chart(fig, use_container_width=True)
 
@@ -149,17 +149,17 @@ def render():
             st.write("")
             a, b = st.columns(2)
             res = q.groupby(["width", "height"]).size().reset_index(name="n").sort_values("n", ascending=False)
-            fig = go.Figure(go.Scatter(x=res["width"], y=res["height"], mode="markers", marker=dict(size=(res["n"] ** 0.5) * 4 + 6, color="#3987e5", line=dict(color="#1a1a19", width=2)), customdata=res["n"], hovertemplate="%{x}×%{y}<br>%{customdata} images<extra></extra>"))
+            fig = go.Figure(go.Scatter(x=res["width"], y=res["height"], mode="markers", marker=dict(size=(res["n"] ** 0.5) * 4 + 6, color="#216B45", line=dict(color="#FFFFFF", width=1.5)), customdata=res["n"], hovertemplate="%{x}×%{y}<br>%{customdata} images<extra></extra>"))
             fig.update_layout(title="Image resolutions (marker area ∝ count)", xaxis_title="width (px)", yaxis_title="height (px)", height=340)
             a.plotly_chart(fig, use_container_width=True)
-            fig = go.Figure(go.Histogram(x=q["black_border_frac"] * 100, nbinsx=30, marker_color="#3987e5", marker_line=dict(color="#1a1a19", width=2)))
+            fig = go.Figure(go.Histogram(x=q["black_border_frac"] * 100, nbinsx=30, marker_color="#216B45", marker_line=dict(color="#DCE4DD", width=1)))
             fig.update_layout(title="Black padding per image (% of pixels)", xaxis_title="% black padding", yaxis_title="images", height=340)
             b.plotly_chart(fig, use_container_width=True)
             a, b = st.columns(2)
-            fig = go.Figure(go.Histogram(x=q["sharpness_lapvar"], nbinsx=30, marker_color="#3987e5", marker_line=dict(color="#1a1a19", width=2)))
+            fig = go.Figure(go.Histogram(x=q["sharpness_lapvar"], nbinsx=30, marker_color="#216B45", marker_line=dict(color="#DCE4DD", width=1)))
             fig.update_layout(title="Sharpness (Laplacian variance, higher = sharper)", xaxis_title="variance", yaxis_title="images", height=320)
             a.plotly_chart(fig, use_container_width=True)
-            fig = go.Figure(go.Histogram(x=q["green_frac"] * 100, nbinsx=30, marker_color="#3987e5", marker_line=dict(color="#1a1a19", width=2)))
+            fig = go.Figure(go.Histogram(x=q["green_frac"] * 100, nbinsx=30, marker_color="#216B45", marker_line=dict(color="#DCE4DD", width=1)))
             fig.update_layout(title="Vegetation cover proxy (% green pixels, HSV)", xaxis_title="% green", yaxis_title="images", height=320)
             b.plotly_chart(fig, use_container_width=True)
             if q["likely_augmented"].mean() > 0.2:

@@ -14,7 +14,7 @@ from weedvision.config import CLASS_NAMES
 def render():
     s = ui.settings()
     ui.hero(
-        "RMCBAM Weed &amp; Crop Detection",
+        "RMCBAM Weed & Crop Detection",
         "YOLOv8s with Residual Multi-Scale CBAM attention · Weed, Tomato, Rose, Marigold, Cauliflower",
     )
 
@@ -25,8 +25,6 @@ def render():
     base = [i for i in project if not i.is_rmcbam]
 
     ds = Path(s.dataset_dir)
-    from weedvision.dataset import scan_folder
-
     scan = _scan(str(ds))
     res = ui.results()
     n_weeds = 0
@@ -41,47 +39,70 @@ def render():
     ui.card(c[3], "This session", f"{len(res)} images", f"{n_weeds} weeds detected")
 
     st.write("")
-    left, right = st.columns([1, 1])
+    left, right = st.columns(2, gap="medium")
     with left:
-        st.subheader("Readiness")
         lines = [
-            ui.check_line(bool(base), "Trained <b>baseline YOLOv8s</b> checkpoint with a Weed class"),
-            ui.check_line(bool(rm), "Trained <b>YOLOv8s + RMCBAM</b> checkpoint with a Weed class"),
-            ui.check_line(scan.get("n_labelme_json", 0) > 0, f"LabelMe annotations in dataset folder ({scan.get('n_labelme_json', 0)} found)"),
-            ui.check_line(bool(scan.get("yaml_files")), "<code>data.yaml</code> present (needed for live validation)"),
+            ui.check_line(bool(base), "Trained <b>baseline YOLOv8s</b> checkpoint with Weed class"),
+            ui.check_line(bool(rm), "Trained <b>YOLOv8s + RMCBAM</b> checkpoint with Weed class"),
+            ui.check_line(scan.get("n_labelme_json", 0) > 0, f"LabelMe annotations ({scan.get('n_labelme_json', 0)} JSON files)"),
+            ui.check_line(bool(scan.get("yaml_files")), "<code>data.yaml</code> configuration file present"),
         ]
         if project:
             miss = sorted({m for i in project for m in i.missing_project_classes})
-            lines.append(ui.check_line(not miss, "All 5 classes declared in model" + (f" — missing: {', '.join(miss)}" if miss else "")))
-        st.markdown("".join(lines), unsafe_allow_html=True)
+            lines.append(ui.check_line(not miss, "All 5 classes declared in model" + (f" (missing: {', '.join(miss)})" if miss else "")))
         if not project:
-            st.info(
-                "No checkpoint with a **Weed** class was found, so no weed detections or accuracy metrics can be shown yet. "
-                "Train with `python tools/train.py --data data/yolo/data.yaml` or copy existing `best.pt` files into `models/`."
+            lines.append(
+                "<div style='margin-top:10px; padding:8px 12px; border-radius:6px; background:#fef3c7; border:1px solid #fde68a; color:#92400e; font-size:0.82rem;'>"
+                "⚠️ No model with <b>Weed</b> class found. Train using <code>tools/train.py</code> or copy <code>best.pt</code> to <code>models/</code>."
+                "</div>"
             )
+        st.markdown(ui.section_card("System & Model Readiness", "".join(lines)), unsafe_allow_html=True)
     with right:
-        st.subheader("Pipeline")
-        st.markdown(
-            """
-1. **Dataset Analytics** — scan images, convert LabelMe → YOLO, validate labels.
-2. **Training** — `tools/train.py` trains baseline and RMCBAM with identical settings.
-3. **Image Detection** — boxes, confidence, unique IDs (W-001…), downloads.
-4. **Explainability** — Grad-CAM / HiResCAM from real gradients; RMCBAM attention maps.
-5. **Weed Analysis & Localization** — count, density, infestation %, severity, crop association, coordinates.
-6. **Model Comparison** — results.csv, plots, or live validation on your data.yaml.
-"""
-        )
-        st.markdown(ui.class_legend(CLASS_NAMES), unsafe_allow_html=True)
+        pipeline_html = """
+        <ol style="margin: 0; padding-left: 18px; font-size: 0.85rem; line-height: 1.65; color: #59665E;">
+            <li><b style="color:#17231D">Dataset Analytics</b> — scan images, convert LabelMe → YOLO, validate.</li>
+            <li><b style="color:#17231D">Training</b> — <code>tools/train.py</code> trains baseline and RMCBAM identically.</li>
+            <li><b style="color:#17231D">Image Detection</b> — collision-free boxes, confidence, unique IDs (W-001…).</li>
+            <li><b style="color:#17231D">Explainability</b> — Grad-CAM / HiResCAM and RMCBAM attention maps.</li>
+            <li><b style="color:#17231D">Weed Localization</b> — count, density, infestation %, severity, coordinates.</li>
+            <li><b style="color:#17231D">Model Comparison</b> — precision, recall, mAP@50, live test validation.</li>
+        </ol>
+        <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #E5ECE6;">
+        """ + ui.class_legend(CLASS_NAMES) + "</div>"
+        st.markdown(ui.section_card("Inspection Pipeline", pipeline_html), unsafe_allow_html=True)
 
     if res:
-        st.subheader("Session summary")
+        st.write("")
+        st.subheader("Session Summary")
         rows = []
         for r in res.values():
             H, W = r["image"].shape[:2]
             w, cr = split_weeds_crops(r["dets"], s)
             m = weed_metrics(w, W, H, s)
-            rows.append({"image": r["name"], "model": ui.short_name(r["model"]), "weeds": m["weed_count"], "crops": len(cr), "infestation_%": round(m["infestation_pct"], 2), "severity": m["severity"], "mean_conf": None if m["mean_conf"] is None else round(m["mean_conf"], 3)})
-        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+            rows.append({
+                "Image": r["name"],
+                "Model": ui.short_name(r["model"]),
+                "Weeds": m["weed_count"],
+                "Crops": len(cr),
+                "Infestation %": m["infestation_pct"] / 100.0,
+                "Severity": m["severity"],
+                "Mean Conf": m["mean_conf"] if m["mean_conf"] is not None else 0.0,
+            })
+        df = pd.DataFrame(rows)
+        st.dataframe(
+            df,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Image": st.column_config.TextColumn("Image"),
+                "Model": st.column_config.TextColumn("Model"),
+                "Weeds": st.column_config.NumberColumn("Weeds", format="%d"),
+                "Crops": st.column_config.NumberColumn("Crops", format="%d"),
+                "Infestation %": st.column_config.ProgressColumn("Infestation", min_value=0.0, max_value=1.0, format="%.1f%%"),
+                "Severity": st.column_config.TextColumn("Severity"),
+                "Mean Conf": st.column_config.NumberColumn("Mean Confidence", format="%.2f"),
+            },
+        )
 
 
 @st.cache_data(ttl=60, show_spinner=False)

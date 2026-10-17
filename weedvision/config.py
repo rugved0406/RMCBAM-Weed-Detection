@@ -18,12 +18,12 @@ CROP_CLASSES: list[str] = ["Tomato", "Rose", "Marigold", "Cauliflower"]
 # Validated categorical order (dataviz reference palette, dark steps) assigned in class-index order:
 # passes CVD separation (>=8 ΔE) and normal-vision floor on the dark surface.
 CLASS_COLORS_HEX: dict[str, str] = {
-    "Weed": "#3987e5",
+    "Weed": "#e11d48",
     "Tomato": "#d95926",
     "Rose": "#199e70",
     "Marigold": "#c98500",
     "Cauliflower": "#d55181",
-    "Crop": "#9085e9",  # unspecified crop (e.g. recovered patches)
+    "Crop": "#16a34a",  # unspecified crop (e.g. recovered patches)
 }
 DEFAULT_COLOR_HEX = "#898781"
 
@@ -70,6 +70,11 @@ class Settings:
     # Optional ground sampling distance (cm / pixel) to express density per m².
     gsd_cm_per_px: float = 0.0
     gradcam_layers: list[int] = field(default_factory=lambda: [15, 18, 21])
+    # Accuracy enhancement toggles
+    augment: bool = False  # Test-Time Augmentation (TTA multi-scale & horizontal flip)
+    agnostic_nms: bool = False  # Class-agnostic box suppression (avoids weed/crop double-hits)
+    ensemble: bool = False  # Multi-model fusion (fuses RMCBAM-tuned + Baseline-best)
+    default_checkpoint: str = ""  # Explicit user-selected default checkpoint
 
     @classmethod
     def load(cls) -> "Settings":

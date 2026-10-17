@@ -1,0 +1,453 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Restrained Agricultural Scientific Palette */
+  --fo-bg-dark: #f8fafc;        /* Main application background (Slate 50) */
+  --fo-bg-canvas: #f1f5f9;      /* Viewport / canvas backing (Slate 100) */
+  --fo-bg-sidebar: #ffffff;     /* White sidebar surface */
+  --fo-bg-panel: #ffffff;       /* White panels & cards */
+  --fo-bg-elevated: #f8fafc;    /* Soft off-white for headers, chips, table alternating */
+  --fo-bg-hover: #f1f5f9;       /* Light neutral hover (Slate 100) */
+  --fo-bg-active: #e2e8f0;      /* Light neutral active (Slate 200) */
+
+  /* Subtle Neutral Borders */
+  --fo-border: #e2e8f0;         /* 1px crisp neutral border */
+  --fo-border-strong: #cbd5e1;  /* Slate 300 divider */
+
+  /* Charcoal Typography */
+  --fo-text-main: #0f172a;      /* Charcoal heading/value (Slate 900) */
+  --fo-text-subtle: #334155;    /* Charcoal body/label (Slate 700) */
+  --fo-text-muted: #64748b;     /* Slate 500 secondary / caption */
+
+  /* Forest Green Accents (Agricultural CV) */
+  --fo-accent-green: #15803d;   /* Forest Green 700 */
+  --fo-accent-green-dark: #166534; /* Forest Green 800 */
+  --fo-accent-green-light: #f0fdf4; /* Green 50 tint */
+  --fo-accent-green-border: #bbf7d0; /* Green 200 border */
+
+  /* Primary Brand Action mapped to Forest Green */
+  --fo-accent-blue: #15803d;
+  --fo-accent-amber: #d97706;   /* Amber 600 warning */
+  --fo-accent-red: #b91c1c;     /* Crimson 700 weed indicator */
+  --fo-accent-purple: #7c3aed;  /* Violet 600 */
+
+  /* Clean Technical Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', Consolas, 'SF Mono', monospace;
+
+  /* Subtle elevations */
+  --fo-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --fo-shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--fo-bg-dark);
+  color: var(--fo-text-subtle);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Technical Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--fo-bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Overall Layout */
+.fo-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--fo-bg-dark);
+}
+
+/* Top Toolbar / Application Header */
+.fo-topbar {
+  height: 48px;
+  background-color: var(--fo-bg-sidebar);
+  border-bottom: 1px solid var(--fo-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  user-select: none;
+  z-index: 30;
+  box-shadow: var(--fo-shadow-sm);
+}
+
+.fo-main-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Left Sidebar Navigation */
+.fo-sidebar {
+  width: 220px;
+  background-color: var(--fo-bg-sidebar);
+  border-right: 1px solid var(--fo-border);
+  display: flex;
+  flex-direction: column;
+  padding: 14px 10px;
+  gap: 4px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+@media (max-width: 860px) {
+  .fo-sidebar {
+    width: 64px;
+    padding: 10px 4px;
+  }
+  .fo-sidebar .fo-nav-label {
+    display: none;
+  }
+}
+
+.fo-nav-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--fo-text-subtle);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 0.12s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.fo-nav-button:hover {
+  background-color: var(--fo-bg-hover);
+  color: var(--fo-text-main);
+}
+
+.fo-nav-button.active {
+  background-color: var(--fo-accent-green-light);
+  color: var(--fo-accent-green);
+  border-color: var(--fo-accent-green-border);
+  font-weight: 600;
+}
+
+/* Center Canvas Workspace */
+.fo-canvas-workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--fo-bg-canvas);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Image Toolbar */
+.fo-image-toolbar {
+  height: 44px;
+  background-color: var(--fo-bg-panel);
+  border-bottom: 1px solid var(--fo-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-size: 12px;
+  user-select: none;
+}
+
+.fo-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fo-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  background: transparent;
+  border: 1px solid var(--fo-border);
+  color: var(--fo-text-subtle);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.fo-icon-button:hover {
+  background-color: var(--fo-bg-hover);
+  color: var(--fo-text-main);
+  border-color: var(--fo-border-strong);
+}
+
+.fo-icon-button.active {
+  background-color: var(--fo-accent-green-light);
+  color: var(--fo-accent-green);
+  border-color: var(--fo-accent-green-border);
+  font-weight: 600;
+}
+
+/* Right Inspector Panel */
+.fo-inspector {
+  width: 360px;
+  background-color: var(--fo-bg-sidebar);
+  border-left: 1px solid var(--fo-border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1080px) {
+  .fo-inspector {
+    width: 320px;
+  }
+}
+
+.fo-inspector-section {
+  border-bottom: 1px solid var(--fo-border);
+}
+
+.fo-inspector-header {
+  padding: 10px 16px;
+  background-color: var(--fo-bg-elevated);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fo-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.fo-inspector-header:hover {
+  color: var(--fo-text-main);
+}
+
+.fo-inspector-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Data Rows */
+.fo-data-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.fo-data-label {
+  color: var(--fo-text-muted);
+}
+
+.fo-data-value {
+  color: var(--fo-text-main);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+/* Class List Filter Item */
+.fo-class-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background-color: #ffffff;
+  border: 1px solid var(--fo-border);
+  font-size: 12px;
+  transition: background-color 0.1s ease;
+}
+
+.fo-class-item:hover {
+  background-color: var(--fo-bg-hover);
+}
+
+.fo-checkbox {
+  accent-color: var(--fo-accent-green);
+  cursor: pointer;
+}
+
+/* Viewport Image Canvas */
+.fo-viewport-container {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  background-color: #0f172a;
+  padding: 14px;
+  box-sizing: border-box;
+}
+
+.fo-image-canvas {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  user-select: none;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+}
+
+.fo-svg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.fo-bbox {
+  pointer-events: auto;
+  cursor: pointer;
+  transition: stroke-width 0.1s ease;
+}
+
+.fo-bbox:hover {
+  stroke-width: 3.5px !important;
+  filter: drop-shadow(0 0 4px rgba(21, 128, 61, 0.6));
+}
+
+.fo-bbox.selected {
+  stroke-width: 4px !important;
+  stroke: #ffffff !important;
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.7));
+}
+
+/* Technical Data Tables */
+.fo-json-tree {
+  background-color: #ffffff;
+  border: 1px solid var(--fo-border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fo-text-subtle);
+  max-height: 240px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Buttons */
+.fo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  border: 1px solid transparent;
+  user-select: none;
+}
+
+.fo-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.fo-btn-primary {
+  background-color: var(--fo-accent-green);
+  color: #ffffff;
+}
+
+.fo-btn-primary:hover:not(:disabled) {
+  background-color: var(--fo-accent-green-dark);
+}
+
+.fo-btn-secondary {
+  background-color: #ffffff;
+  color: var(--fo-text-subtle);
+  border-color: var(--fo-border);
+}
+
+.fo-btn-secondary:hover:not(:disabled) {
+  background-color: var(--fo-bg-hover);
+  color: var(--fo-text-main);
+  border-color: var(--fo-border-strong);
+}
+
+.fo-btn-subtle {
+  background-color: transparent;
+  color: var(--fo-text-muted);
+}
+
+.fo-btn-subtle:hover:not(:disabled) {
+  background-color: var(--fo-bg-hover);
+  color: var(--fo-text-main);
+}
+
+/* Form Controls */
+select, input[type="text"], input[type="number"] {
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color 0.12s ease;
+}
+
+select:focus, input[type="text"]:focus, input[type="number"]:focus {
+  border-color: var(--fo-accent-green) !important;
+}
+
+input[type="range"] {
+  accent-color: var(--fo-accent-green);
+  cursor: pointer;
+}
+
+/* Badges */
+.badge-weed {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.badge-crop {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.badge-neutral {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}

@@ -35,7 +35,10 @@ class CheckpointInfo:
 
     @property
     def label(self) -> str:
-        return f"{Path(self.path).parent.parent.name}/{Path(self.path).name}" if "weights" in self.path else Path(self.path).name
+        p = Path(self.path)
+        if "uploaded" in str(p).lower():
+            return f"uploaded/{p.name}"
+        return f"{p.parent.parent.name}/{p.name}" if "weights" in str(p) else p.name
 
     @property
     def class_list(self) -> list[str]:
@@ -52,7 +55,13 @@ class CheckpointInfo:
 
     @property
     def is_smoke(self) -> bool:
-        return "smoke" in self.path.lower()
+        name = str(self.train_args.get("name", "")).lower()
+        epochs = self.train_args.get("epochs", None)
+        return (
+            "smoke" in self.path.lower()
+            or "smoke" in name
+            or (isinstance(epochs, (int, float)) and epochs <= 8)
+        )
 
     @property
     def is_project_model(self) -> bool:
@@ -87,18 +96,35 @@ class CheckpointInfo:
 
 
 def discover_checkpoints(*dirs: str | Path) -> list[Path]:
-    """All *.pt files directly in model dirs plus Ultralytics run weights (runs/**/weights/*.pt)."""
+    """All *.pt files directly in model dirs, subdirectories (e.g. uploaded/), and Ultralytics run weights."""
     found: list[Path] = []
     for d in dirs:
         d = Path(d)
         if not d.exists():
             continue
-        found += sorted(d.glob("*.pt"))
+        found += sorted(d.rglob("*.pt"))
         found += sorted(d.glob("**/weights/*.pt"))
     uniq: dict[str, Path] = {}
     for p in found:
         uniq[str(p.resolve())] = p
-    return sorted(uniq.values(), key=lambda p: (p.name != "best.pt", str(p)))
+
+    def _rank(p: Path):
+        name = p.name.lower()
+        full = str(p).lower()
+        is_smoke = "smoke" in full or name in ("yolov8s_baseline_best.pt", "yolov8s_rmcbam_best.pt")
+        is_tuned = "tuned" in name or "weed_detection_best" in name
+        is_uploaded = "uploaded" in full
+        if is_uploaded and not is_smoke:
+            tier = 0
+        elif is_tuned and not is_smoke:
+            tier = 1
+        elif not is_smoke:
+            tier = 2
+        else:
+            tier = 3
+        return (tier, p.name != "best.pt", str(p))
+
+    return sorted(uniq.values(), key=_rank)
 
 
 def _load_raw(path: str | Path) -> tuple[dict, torch.nn.Module]:

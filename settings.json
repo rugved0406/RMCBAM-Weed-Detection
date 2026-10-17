@@ -1,0 +1,31 @@
+{
+  "models_dir": "C:\\Users\\indug\\Downloads\\weed detection\\RMCBAM-Weed-Detection\\models",
+  "runs_dir": "C:\\Users\\indug\\Downloads\\weed detection\\RMCBAM-Weed-Detection\\runs",
+  "dataset_dir": "C:\\Users\\indug\\Downloads\\weed detection\\RMCBAM-Weed-Detection\\data",
+  "device": "auto",
+  "imgsz": 640,
+  "conf": 0.28,
+  "iou": 0.45,
+  "max_det": 300,
+  "weed_class": "Weed",
+  "crop_classes": [
+    "Tomato",
+    "Rose",
+    "Marigold",
+    "Cauliflower"
+  ],
+  "severity_low": 5.0,
+  "severity_moderate": 15.0,
+  "severity_high": 30.0,
+  "proximity_frac": 0.15,
+  "gsd_cm_per_px": 0.0,
+  "gradcam_layers": [
+    15,
+    18,
+    21
+  ],
+  "augment": true,
+  "agnostic_nms": true,
+  "ensemble": false,
+  "default_checkpoint": "C:\\Users\\indug\\Downloads\\weed detection\\RMCBAM-Weed-Detection\\models\\weed_detection_best.pt"
+}

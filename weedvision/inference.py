@@ -79,10 +79,32 @@ def assign_ids(dets: list[Detection]) -> list[Detection]:
     return out
 
 
-def run_detection(yolo, image_rgb: np.ndarray, conf: float, iou: float, imgsz: int, device: str, max_det: int = 300):
-    """Run YOLO prediction. Returns (detections, speed_ms_dict)."""
+def run_detection(
+    yolo,
+    image_rgb: np.ndarray,
+    conf: float,
+    iou: float,
+    imgsz: int,
+    device: str,
+    max_det: int = 300,
+    augment: bool = False,
+    agnostic_nms: bool = False,
+):
+    """Run YOLO prediction with optional Test-Time Augmentation (TTA) and class-agnostic NMS.
+    Returns (detections, speed_ms_dict).
+    """
     bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
-    res = yolo.predict(bgr, conf=conf, iou=iou, imgsz=imgsz, device=device, max_det=max_det, verbose=False)[0]
+    res = yolo.predict(
+        bgr,
+        conf=conf,
+        iou=iou,
+        imgsz=imgsz,
+        device=device,
+        max_det=max_det,
+        augment=augment,
+        agnostic_nms=agnostic_nms,
+        verbose=False,
+    )[0]
     names = res.names
     dets: list[Detection] = []
     if res.boxes is not None and len(res.boxes):
@@ -94,20 +116,102 @@ def run_detection(yolo, image_rgb: np.ndarray, conf: float, iou: float, imgsz: i
     return assign_ids(dets), dict(res.speed)
 
 
+def run_ensemble_detection(
+    models: list,
+    image_rgb: np.ndarray,
+    conf: float,
+    iou: float,
+    imgsz: int,
+    device: str,
+    max_det: int = 300,
+    augment: bool = False,
+    agnostic_nms: bool = False,
+):
+    """Run multi-model prediction and fuse bounding boxes using batched NMS for enhanced precision & recall."""
+    if not models:
+        return [], {"preprocess": 0.0, "inference": 0.0, "postprocess": 0.0}
+    if len(models) == 1:
+        return run_detection(
+            models[0],
+            image_rgb,
+            conf=conf,
+            iou=iou,
+            imgsz=imgsz,
+            device=device,
+            max_det=max_det,
+            augment=augment,
+            agnostic_nms=agnostic_nms,
+        )
+
+    import torch
+    import torchvision
+
+    all_dets: list[Detection] = []
+    combined_speed = {"preprocess": 0.0, "inference": 0.0, "postprocess": 0.0}
+
+    for m in models:
+        dets, spd = run_detection(
+            m,
+            image_rgb,
+            conf=conf,
+            iou=iou,
+            imgsz=imgsz,
+            device=device,
+            max_det=max_det,
+            augment=augment,
+            agnostic_nms=agnostic_nms,
+        )
+        all_dets.extend(dets)
+        for k, v in spd.items():
+            combined_speed[k] = combined_speed.get(k, 0.0) + float(v)
+
+    if not all_dets:
+        return [], combined_speed
+
+    boxes = torch.tensor([[d.x1, d.y1, d.x2, d.y2] for d in all_dets], dtype=torch.float32)
+    scores = torch.tensor([d.conf for d in all_dets], dtype=torch.float32)
+    classes = torch.tensor([d.cls_id for d in all_dets], dtype=torch.int64)
+
+    if agnostic_nms:
+        keep = torchvision.ops.nms(boxes, scores, iou_threshold=iou)
+    else:
+        keep = torchvision.ops.batched_nms(boxes, scores, classes, iou_threshold=iou)
+
+    keep_indices = keep[:max_det].cpu().numpy().tolist()
+    final_dets = [all_dets[i] for i in keep_indices]
+    return assign_ids(final_dets), combined_speed
+
+
 def draw_detections(image_rgb: np.ndarray, dets: list[Detection], show_conf: bool = True, highlight: str | None = None) -> np.ndarray:
     img = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR).copy()
     H, W = img.shape[:2]
-    t = max(2, int(round(0.0025 * (H + W) / 2)))
-    fs = max(0.45, 0.0009 * (H + W) / 2)
+    # Restrained scale: font scale between 0.38 and 0.65, thickness 1 or 2
+    avg_dim = (H + W) / 2
+    t = max(1, min(2, int(round(0.0012 * avg_dim))))
+    fs = max(0.38, min(0.60, 0.00045 * avg_dim))
+    
+    # Pre-render subtle overlay for labels
+    overlay = img.copy()
     for d in dets:
         col = hex_to_bgr(class_color_hex(d.cls_name))
         p1, p2 = (int(d.x1), int(d.y1)), (int(d.x2), int(d.y2))
         cv2.rectangle(img, p1, p2, col, t + (2 if highlight and d.uid == highlight else 0), cv2.LINE_AA)
         label = f"{d.uid} {d.cls_name}" + (f" {d.conf:.2f}" if show_conf else "")
-        (tw, th), bl = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, fs, max(1, t // 2))
-        y0 = p1[1] - th - bl - 4 if p1[1] - th - bl - 4 > 0 else p1[1]
-        cv2.rectangle(img, (p1[0], y0), (p1[0] + tw + 6, y0 + th + bl + 4), col, -1)
-        cv2.putText(img, label, (p1[0] + 3, y0 + th + 2), cv2.FONT_HERSHEY_SIMPLEX, fs, (15, 15, 15), max(1, t // 2), cv2.LINE_AA)
+        (tw, th), bl = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, fs, 1)
+        y0 = p1[1] - th - bl - 4 if p1[1] - th - bl - 4 > 0 else p1[1] + 2
+        cv2.rectangle(overlay, (p1[0], y0), (p1[0] + tw + 6, y0 + th + bl + 4), col, -1)
+    
+    # Blend overlay with 85% opacity for label badges
+    cv2.addWeighted(overlay, 0.85, img, 0.15, 0, img)
+    
+    # Draw crisp white antialiased text on top
+    for d in dets:
+        p1 = (int(d.x1), int(d.y1))
+        label = f"{d.uid} {d.cls_name}" + (f" {d.conf:.2f}" if show_conf else "")
+        (tw, th), bl = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, fs, 1)
+        y0 = p1[1] - th - bl - 4 if p1[1] - th - bl - 4 > 0 else p1[1] + 2
+        cv2.putText(img, label, (p1[0] + 3, y0 + th + 1), cv2.FONT_HERSHEY_SIMPLEX, fs, (255, 255, 255), 1, cv2.LINE_AA)
+        
     return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
 

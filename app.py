@@ -24,30 +24,30 @@ from weedvision.views import (  # noqa: E402
 )
 
 PAGES = {
-    "Dashboard Overview": ("🏠", overview.render),
-    "Image Detection": ("🔎", detection.render),
-    "Weed Explainability": ("🔥", explainability.render),
-    "Weed Analysis": ("📊", analysis_page.render),
-    "Weed Localization": ("📍", localization.render),
-    "Model Comparison": ("⚖️", comparison_page.render),
-    "Dataset Analytics": ("🗂️", dataset_page.render),
-    "Model Information": ("🧠", model_info.render),
-    "Settings": ("⚙️", settings_page.render),
+    "Dashboard Overview": ("◈", overview.render),
+    "Image Detection": ("◈", detection.render),
+    "Weed Explainability": ("◈", explainability.render),
+    "Weed Analysis": ("◈", analysis_page.render),
+    "Weed Localization": ("◈", localization.render),
+    "Model Comparison": ("◈", comparison_page.render),
+    "Dataset Analytics": ("◈", dataset_page.render),
+    "Model Information": ("◈", model_info.render),
+    "Settings": ("◈", settings_page.render),
 }
 
 
 def main():
     ui.inject_css()
     ui.settings()
-    st.sidebar.markdown('<div class="wv-brand">🌿 WeedVision · RMCBAM</div>', unsafe_allow_html=True)
-    st.sidebar.caption("YOLOv8s + Residual Multi-Scale CBAM")
+    st.sidebar.markdown('<div class="wv-brand">WeedVision · RMCBAM</div>', unsafe_allow_html=True)
+    st.sidebar.caption("Precision Agricultural Computer Vision")
     if ui.settings().demo_mode:
-        st.sidebar.warning("DEMO MODE: smoke-test models on partial labels. Use to explore the UI, not for results.")
-    page = st.sidebar.radio("Navigate", list(PAGES), format_func=lambda p: f"{PAGES[p][0]}  {p}", label_visibility="collapsed", key="nav")
+        st.sidebar.warning("DEMO MODE: Smoke-test checkpoint active.")
+    page = st.sidebar.radio("Navigation", list(PAGES), format_func=lambda p: f"{PAGES[p][0]}  {p}", label_visibility="collapsed", key="nav")
     st.sidebar.divider()
     ui.sidebar_model_picker()
     st.sidebar.divider()
-    st.sidebar.caption(f"Device: **{ui.device()}** · conf {ui.settings().conf} · IoU {ui.settings().iou}")
+    st.sidebar.caption(f"Engine: **{ui.device()}** · conf {ui.settings().conf} · IoU {ui.settings().iou}")
     try:
         PAGES[page][1]()
     except Exception as e:  # keep the app alive; show the real error
@@ -56,3 +56,4 @@ def main():
 
 
 main()
+

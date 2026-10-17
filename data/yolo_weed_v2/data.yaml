@@ -1,0 +1,9 @@
+train: images/train
+val: images/val
+nc: 5
+names:
+  0: Weed
+  1: Tomato
+  2: Rose
+  3: Marigold
+  4: Cauliflower

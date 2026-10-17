@@ -13,46 +13,230 @@ import streamlit as st
 from weedvision.config import PROJECT_ROOT, SEVERITY_COLORS, SEVERITY_ICONS, Settings, class_color_hex, resolve_device
 
 # ---------------------------------------------------------------------------------------------- theme
-INK, INK2, MUTED, GRID, AXIS, SURFACE, PAGE = "#f2f1ec", "#c3c2b7", "#898781", "#2c2c2a", "#383835", "#1a1a19", "#0d0d0d"
+INK = "#17231D"          # Primary dark text
+INK2 = "#59665E"         # Secondary text
+MUTED = "#76867D"        # Muted captions
+BORDER = "#DCE4DD"       # Subtle border
+BORDER_SUBTLE = "#E5ECE6"
+SURFACE = "#FFFFFF"      # Clean white cards
+SURFACE_MUTED = "#F8FAF8"
+PAGE_BG = "#F5F7F5"      # Light neutral background
+ACCENT_GREEN = "#216B45" # Forest Green
+ACCENT_LIGHT = "#E8F3EC" # Pale green active/hover background
 
 pio.templates["weedvision"] = go.layout.Template(
     layout=dict(
-        paper_bgcolor=SURFACE,
-        plot_bgcolor=SURFACE,
-        font=dict(color=INK2, family="Inter, system-ui, sans-serif", size=13),
-        title=dict(font=dict(color=INK, size=15), x=0, xanchor="left"),
-        xaxis=dict(gridcolor=GRID, linecolor=AXIS, zerolinecolor=AXIS, tickcolor=AXIS, title_font=dict(color=MUTED)),
-        yaxis=dict(gridcolor=GRID, linecolor=AXIS, zerolinecolor=AXIS, tickcolor=AXIS, title_font=dict(color=MUTED)),
-        legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(color=INK2)),
-        hoverlabel=dict(bgcolor="#262624", bordercolor=AXIS, font=dict(color=INK)),
-        margin=dict(l=48, r=16, t=48, b=44),
-        colorway=["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181", "#008300", "#9085e9", "#e66767"],
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color=INK2, family="Inter, system-ui, -apple-system, sans-serif", size=12),
+        title=dict(font=dict(color=INK, size=14), x=0, xanchor="left"),
+        xaxis=dict(gridcolor="#E5ECE6", linecolor="#DCE4DD", zerolinecolor="#DCE4DD", tickcolor="#DCE4DD", title_font=dict(color=MUTED)),
+        yaxis=dict(gridcolor="#E5ECE6", linecolor="#DCE4DD", zerolinecolor="#DCE4DD", tickcolor="#DCE4DD", title_font=dict(color=MUTED)),
+        legend=dict(bgcolor="rgba(255,255,255,0.9)", font=dict(color=INK2)),
+        hoverlabel=dict(bgcolor="#FFFFFF", bordercolor="#DCE4DD", font=dict(color=INK)),
+        margin=dict(l=40, r=16, t=40, b=36),
+        colorway=["#dc2626", "#ea580c", "#059669", "#d97706", "#7c3aed", "#0d9488"],
     )
 )
 pio.templates.default = "weedvision"
 
-# Single-hue sequential scale (dark surface -> blue -> pale blue) for heatmaps and matrices.
-SEQ_SCALE = [[0.0, "#1a1a19"], [0.5, "#2a6fc4"], [1.0, "#cfe2fb"]]
+SEQ_SCALE = [[0.0, "#F5F7F5"], [0.5, "#4ade80"], [1.0, "#216B45"]]
 
 CSS = f"""
 <style>
-.block-container {{ padding-top: 1.6rem; max-width: 1400px; }}
-h1, h2, h3 {{ letter-spacing: -0.01em; }}
-.wv-hero {{ padding: 18px 22px; border: 1px solid {AXIS}; border-radius: 10px;
-  background: linear-gradient(135deg, #14201a 0%, {SURFACE} 60%); margin-bottom: 14px; }}
-.wv-hero h1 {{ margin: 0; font-size: 1.7rem; color: {INK}; }}
-.wv-hero p {{ margin: 4px 0 0; color: {INK2}; }}
-.wv-card {{ border: 1px solid {AXIS}; border-radius: 10px; padding: 14px 16px; background: {SURFACE}; height: 100%; }}
-.wv-card .k {{ color: {MUTED}; font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; }}
-.wv-card .v {{ color: {INK}; font-size: 1.6rem; font-weight: 650; line-height: 1.2; margin-top: 2px; }}
-.wv-card .s {{ color: {INK2}; font-size: .82rem; margin-top: 2px; }}
-.wv-pill {{ display:inline-block; padding: 2px 10px; border-radius: 999px; font-size: .8rem; font-weight: 600;
-  border: 1px solid {AXIS}; color: {INK}; background: #222220; }}
-.wv-check {{ font-size: .92rem; margin: 3px 0; color: {INK2}; }}
-.wv-check b {{ color: {INK}; }}
-.wv-legend span {{ display:inline-flex; align-items:center; margin-right:14px; color:{INK2}; font-size:.85rem; }}
-.wv-legend i {{ width:11px; height:11px; border-radius:3px; display:inline-block; margin-right:6px; }}
-section[data-testid="stSidebar"] .wv-brand {{ font-weight: 700; font-size: 1.05rem; color: {INK}; }}
+/* Page container & background */
+.stApp {{
+  background-color: {PAGE_BG} !important;
+  color: {INK} !important;
+}}
+
+.block-container {{
+  padding-top: 1.2rem;
+  padding-bottom: 2rem;
+  max-width: 1360px;
+}}
+
+/* Typography */
+body, [class*="css"] {{
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: {INK} !important;
+}}
+
+h1, h2, h3, h4, h5, h6, p, span, label {{
+  color: {INK} !important;
+}}
+
+p, span, .stCaption {{
+  color: {INK2};
+}}
+
+/* Sidebar Styling */
+section[data-testid="stSidebar"] {{
+  width: 240px !important;
+  min-width: 240px !important;
+  background-color: {SURFACE} !important;
+  border-right: 1px solid {BORDER} !important;
+}}
+
+section[data-testid="stSidebar"] * {{
+  color: {INK} !important;
+}}
+
+section[data-testid="stSidebar"] .wv-brand {{
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: {ACCENT_GREEN} !important;
+  letter-spacing: -0.02em;
+  padding: 4px 0;
+}}
+
+/* Sidebar Radio Navigation (Pale green active button) */
+section[data-testid="stSidebar"] div[data-testid="stRadio"] > div[role="radiogroup"] > label {{
+  padding: 6px 10px !important;
+  border-radius: 6px !important;
+  margin-bottom: 2px !important;
+  transition: all 0.15s ease !important;
+}}
+
+section[data-testid="stSidebar"] div[data-testid="stRadio"] > div[role="radiogroup"] > label:hover {{
+  background-color: {ACCENT_LIGHT} !important;
+}}
+
+section[data-testid="stSidebar"] div[data-testid="stRadio"] > div[role="radiogroup"] > label[data-checked="true"],
+section[data-testid="stSidebar"] div[data-testid="stRadio"] > div[role="radiogroup"] > label[aria-checked="true"] {{
+  background-color: {ACCENT_LIGHT} !important;
+  border-left: 3px solid {ACCENT_GREEN} !important;
+}}
+
+section[data-testid="stSidebar"] div[data-testid="stRadio"] > div[role="radiogroup"] > label[data-checked="true"] p,
+section[data-testid="stSidebar"] div[data-testid="stRadio"] > div[role="radiogroup"] > label[aria-checked="true"] p {{
+  color: {ACCENT_GREEN} !important;
+  font-weight: 600 !important;
+}}
+
+/* Premium Header Banner */
+.wv-hero {{
+  padding: 16px 20px;
+  border: 1px solid {BORDER};
+  border-left: 4px solid {ACCENT_GREEN};
+  border-radius: 8px;
+  background: {SURFACE};
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}}
+.wv-hero h1 {{ margin: 0; font-size: 1.45rem; color: {INK} !important; font-weight: 700; }}
+.wv-hero p {{ margin: 4px 0 0; color: {INK2} !important; font-size: 0.88rem; }}
+
+/* Precision Agricultural Metric Cards */
+.wv-metric-card {{
+  border: 1px solid {BORDER};
+  border-radius: 8px;
+  padding: 14px 16px;
+  background: {SURFACE};
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  height: 100%;
+}}
+.wv-metric-card .k {{
+  color: {MUTED} !important;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}}
+.wv-metric-card .v {{
+  color: {ACCENT_GREEN} !important;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 3px;
+}}
+.wv-metric-card .s {{
+  color: {INK2} !important;
+  font-size: 0.78rem;
+  margin-top: 3px;
+}}
+
+/* Content Section Card */
+.wv-section-card {{
+  border: 1px solid {BORDER};
+  border-radius: 8px;
+  padding: 16px 18px;
+  background: {SURFACE};
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  height: 100%;
+}}
+.wv-section-card h3 {{
+  margin-top: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: {INK} !important;
+  border-bottom: 1px solid {BORDER_SUBTLE};
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}}
+
+/* Responsive Image Viewport with Fixed Max-Height (460px) */
+.wv-image-frame {{
+  max-height: 460px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #181c1a;
+  border-radius: 8px;
+  border: 1px solid {BORDER};
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}}
+.wv-image-frame img {{
+  max-height: 460px !important;
+  width: auto !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+}}
+
+/* Clean Severity Badge */
+.wv-pill {{
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid {BORDER};
+  background: {SURFACE_MUTED};
+}}
+
+/* Check Line items */
+.wv-check {{ font-size: .90rem; margin: 6px 0; color: {INK2} !important; display: flex; align-items: center; gap: 8px; }}
+.wv-check b {{ color: {INK} !important; }}
+
+/* Class Legend */
+.wv-legend {{ display: flex; flex-wrap: wrap; gap: 10px; padding: 4px 0; }}
+.wv-legend span {{ display:inline-flex; align-items:center; color:{INK2} !important; font-size:.82rem; font-weight: 500; }}
+.wv-legend i {{ width:10px; height:10px; border-radius:2px; display:inline-block; margin-right:5px; }}
+
+/* Form controls, inputs, buttons */
+button[kind="primary"] {{
+  background-color: {ACCENT_GREEN} !important;
+  border-color: {ACCENT_GREEN} !important;
+  color: #FFFFFF !important;
+  font-weight: 600 !important;
+}}
+
+button[kind="secondary"] {{
+  background-color: {SURFACE} !important;
+  border-color: {BORDER} !important;
+  color: {INK} !important;
+}}
+
+div[data-testid="stFileUploader"] {{
+  border: 1px dashed {BORDER};
+  border-radius: 8px;
+  background: {SURFACE};
+  padding: 8px;
+}}
 </style>
 """
 
@@ -66,12 +250,19 @@ def hero(title: str, subtitle: str):
 
 
 def card(col, key: str, value: str, sub: str = ""):
-    col.markdown(f'<div class="wv-card"><div class="k">{key}</div><div class="v">{value}</div><div class="s">{sub}</div></div>', unsafe_allow_html=True)
+    col.markdown(f'<div class="wv-metric-card"><div class="k">{key}</div><div class="v">{value}</div><div class="s">{sub}</div></div>', unsafe_allow_html=True)
+
+
+def section_card(title: str, content_html: str) -> str:
+    return f'<div class="wv-section-card"><h3>{title}</h3><div>{content_html}</div></div>'
 
 
 def severity_pill(sev: str) -> str:
     c = SEVERITY_COLORS.get(sev, MUTED)
-    return f'<span class="wv-pill" style="border-color:{c}"><span style="color:{c}">{SEVERITY_ICONS.get(sev, "")}</span> {sev}</span>'
+    return f'<span class="wv-pill" style="border-color:{c}; color:{c}"><span style="color:{c}">{SEVERITY_ICONS.get(sev, "")}</span> {sev}</span>'
+
+
+
 
 
 def class_legend(names: list[str]) -> str:

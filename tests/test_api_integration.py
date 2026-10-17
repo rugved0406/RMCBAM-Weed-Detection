@@ -94,7 +94,11 @@ def test_predict_sample_endpoint():
 
 def test_explain_rmcbam_endpoint():
     img_path = PROJECT_ROOT / "data" / "yolo_weed_partial" / "images" / "train" / "img112.jpg"
-    rmcbam_path = PROJECT_ROOT / "models" / "yolov8s_rmcbam_best.pt"
+    rmcbam_path = PROJECT_ROOT / "models" / "yolov8s_rmcbam_tuned.pt"
+    if not rmcbam_path.exists():
+        rmcbam_path = PROJECT_ROOT / "models" / "yolov8s_rmcbam_best.pt"
+    if not rmcbam_path.exists():
+        pytest.skip("RMCBAM model weights not available")
     
     with open(img_path, "rb") as f:
         response = client.post(

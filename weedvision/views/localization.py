@@ -41,8 +41,8 @@ def render():
         fig.add_trace(
             go.Scatter(
                 x=[d.cx for d in ds], y=[d.cy for d in ds], mode="markers+text" if len(ds) <= 25 else "markers",
-                text=[d.uid for d in ds], textposition="top center", textfont=dict(color="#ffffff", size=11),
-                marker=dict(size=10, color=class_color_hex(name), line=dict(color="#1a1a19", width=2)), name=name,
+                text=[d.uid for d in ds], textposition="top center", textfont=dict(color="#17231D", size=11),
+                marker=dict(size=10, color=class_color_hex(name), line=dict(color="#FFFFFF", width=1.5)), name=name,
                 customdata=[[d.uid, d.conf, d.x1, d.y1, d.x2, d.y2, d.area] for d in ds],
                 hovertemplate="<b>%{customdata[0]}</b><br>centre (%{x:.0f}, %{y:.0f})<br>box (%{customdata[2]:.0f}, %{customdata[3]:.0f}) – (%{customdata[4]:.0f}, %{customdata[5]:.0f})<br>conf %{customdata[1]:.3f}<br>area %{customdata[6]:,.0f} px²<extra>" + name + "</extra>",
             )

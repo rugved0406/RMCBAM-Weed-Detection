@@ -39,6 +39,15 @@ def main():
     ap.add_argument("--cos-lr", action="store_true", help="Use cosine learning rate schedule")
     ap.add_argument("--warmup-epochs", type=float, default=3.0, help="Warmup epochs")
     ap.add_argument("--close-mosaic", type=int, default=10, help="Disable mosaic augmentation for the final N epochs")
+    ap.add_argument("--scale", type=float, default=0.5, help="Image scale gain factor")
+    ap.add_argument("--fliplr", type=float, default=0.5, help="Horizontal flip probability")
+    ap.add_argument("--flipud", type=float, default=0.0, help="Vertical flip probability")
+    ap.add_argument("--mosaic", type=float, default=1.0, help="Mosaic augmentation probability")
+    ap.add_argument("--hsv-h", type=float, default=0.015, help="HSV-Hue augmentation fraction")
+    ap.add_argument("--hsv-s", type=float, default=0.7, help="HSV-Saturation augmentation fraction")
+    ap.add_argument("--hsv-v", type=float, default=0.4, help="HSV-Value augmentation fraction")
+    ap.add_argument("--translate", type=float, default=0.1, help="Translation fraction")
+    ap.add_argument("--name", default=None, help="Custom experiment name")
     ap.add_argument("--project", default=str(PROJECT_ROOT / "runs" / "detect"))
     ap.add_argument("--patience", type=int, default=50)
     ap.add_argument("--nbs", type=int, default=16, help="Nominal batch size for gradient accumulation (set = --batch on tiny datasets)")
@@ -59,13 +68,16 @@ def main():
         data=a.data, epochs=a.epochs, imgsz=a.imgsz, batch=a.batch, device=device, workers=a.workers,
         seed=a.seed, deterministic=True, project=str(Path(a.project).resolve()), exist_ok=True, patience=a.patience, plots=True, nbs=a.nbs,
         optimizer=a.optimizer, lr0=a.lr0, lrf=a.lrf, cos_lr=a.cos_lr, warmup_epochs=a.warmup_epochs, close_mosaic=a.close_mosaic,
+        scale=a.scale, fliplr=a.fliplr, flipud=a.flipud, mosaic=a.mosaic, hsv_h=a.hsv_h, hsv_s=a.hsv_s, hsv_v=a.hsv_v, translate=a.translate,
     )
     if a.variant in ("baseline", "both"):
-        print("=== Training baseline YOLOv8s ===")
-        YOLO(a.weights).train(name="yolov8s_baseline" + a.suffix, **common)
+        run_name = a.name if a.name else ("yolov8s_baseline" + a.suffix)
+        print(f"=== Training baseline YOLOv8s ({run_name}) ===")
+        YOLO(a.weights).train(name=run_name, **common)
     if a.variant in ("rmcbam", "both"):
-        print(f"=== Training YOLOv8s + RMCBAM (layers {a.layers}) ===")
-        YOLO(a.weights).train(name="yolov8s_rmcbam" + a.suffix, trainer=make_rmcbam_trainer(a.layers), **common)
+        run_name = (a.name + "_rmcbam") if a.name else ("yolov8s_rmcbam" + a.suffix)
+        print(f"=== Training YOLOv8s + RMCBAM ({run_name}, layers {a.layers}) ===")
+        YOLO(a.weights).train(name=run_name, trainer=make_rmcbam_trainer(a.layers), **common)
 
 
 if __name__ == "__main__":
